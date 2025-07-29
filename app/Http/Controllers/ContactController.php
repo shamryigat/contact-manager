@@ -6,34 +6,46 @@ use App\Models\Contact;
 use App\Http\Requests\ContactRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
-class ContactController extends Controller
-{
+class ContactController extends Controller {
+    // Method to clear cached dashboard data
+    private function refreshDashboardCache(){
+        Cache::forget('total_contacts');
+        Cache::forget('recent_contacts');
+    }
+
+    // Method to log events
+    private function logEvent(string $action, Contact $contact){
+        \Log::channel('contact')->info("Contact {$action}", [
+            'user' => auth()->user()->email,
+            'contact_id' => $contact->id,
+            'name' => $contact->name,
+            'email' => $contact->email,
+        ]);
+    }
+
     // Dashboard
-    public function dashboard()
-    {
-        $totalContacts = Contact::count();
-        $recentContacts = Contact::latest()->take(5)->get();
+    public function dashboard(){
+        $totalContacts = Cache::remember('total_contacts', 600, fn () => Contact::count());
+        $recentContacts = Cache::remember('recent_contacts', 600, fn () => Contact::latest()->take(5)->get());
 
         return view('dashboard', compact('totalContacts', 'recentContacts'));
     }
 
     // List contacts
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         $search = $request->query('search');
-        $contacts = Contact::when($search, function ($query, $search) {
+        $contacts = Contact::when($search, fn ($query, $search) =>
             $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-        })->paginate(10);
+                  ->orWhere('email', 'like', "%{$search}%")
+        )->paginate(10);
 
         return view('contacts.index', compact('contacts', 'search'));
     }
 
     // Show create form
-    public function create()
-    {
+    public function create(){
         return view('contacts.create');
     }
 
@@ -47,29 +59,22 @@ class ContactController extends Controller
 
         $contact = Contact::create($data);
 
-        // Send email notification
+        $this->refreshDashboardCache();
+
         \Mail::to(auth()->user()->email)->send(new \App\Mail\ContactCreatedMail($contact));
 
-        // Log the event
-        \Log::channel('contact')->info('New contact created', [
-            'user' => auth()->user()->email,
-            'contact_id' => $contact->id,
-            'name' => $contact->name,
-            'email' => $contact->email,
-        ]);
+        $this->logEvent('created', $contact);
 
         return redirect()->route('contacts.index')->with('success', 'Contact created successfully!');
     }
 
     // Show edit form
-    public function edit(Contact $contact)
-    {
+    public function edit(Contact $contact){
         return view('contacts.edit', compact('contact'));
     }
 
     // Update contact
-    public function update(ContactRequest $request, Contact $contact)
-    {
+    public function update(ContactRequest $request, Contact $contact){
         $data = $request->validated();
 
         if ($request->hasFile('photo')) {
@@ -81,17 +86,22 @@ class ContactController extends Controller
 
         $contact->update($data);
 
+        $this->refreshDashboardCache();
+        $this->logEvent('updated', $contact);
+
         return redirect()->route('contacts.index')->with('success', 'Contact updated successfully!');
     }
 
     // Delete contact
-    public function destroy(Contact $contact)
-    {
+    public function destroy(Contact $contact){
         if ($contact->photo_path) {
             Storage::disk('public')->delete($contact->photo_path);
         }
 
         $contact->delete();
+
+        $this->refreshDashboardCache();
+        $this->logEvent('deleted', $contact);
 
         return redirect()->route('contacts.index')->with('success', 'Contact deleted successfully!');
     }

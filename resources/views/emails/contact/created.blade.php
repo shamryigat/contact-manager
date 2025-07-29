@@ -1,5 +1,5 @@
 @component('mail::message')
-# New Contact Created 🎉
+# New Contact Created
 
 A new contact has been added:
 

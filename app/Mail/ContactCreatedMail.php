@@ -7,19 +7,16 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ContactCreatedMail extends Mailable
-{
+class ContactCreatedMail extends Mailable {
     use Queueable, SerializesModels;
 
     public $contact;
 
-    public function __construct(Contact $contact)
-    {
+    public function __construct(Contact $contact) {
         $this->contact = $contact;
     }
 
-    public function build()
-    {
+    public function build(){
         return $this->subject('New Contact Added')
                     ->markdown('emails.contact.created');
     }
