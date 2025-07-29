@@ -8,6 +8,17 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            <!-- 🔹 Cache Info -->
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-sm text-gray-500">
+                    <strong>Last Updated:</strong> {{ $lastUpdated }}
+                </p>
+                <a href="{{ route('dashboard.refresh') }}" 
+                   class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                    Refresh Cache
+                </a>
+            </div>
+
             <!-- 🔹 Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div class="bg-white shadow rounded-lg p-4 text-center">
@@ -23,7 +34,7 @@
                 <div class="bg-white shadow rounded-lg p-4 text-center">
                     <h3 class="text-gray-500 text-sm">Last Updated</h3>
                     <p class="text-3xl font-bold text-gray-800">
-                        {{ $recentContacts->first()?->updated_at->diffForHumans() ?? 'N/A' }}
+                        {{ $recentContacts->first()?->name ?? 'N/A' }}
                     </p>
                 </div>
             </div>

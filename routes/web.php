@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Api\ContactApiController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
 
 Route::get('/', function () {
     return view('welcome');
@@ -12,6 +13,12 @@ Route::get('/', function () {
 // 🔹 Authenticated Web Routes
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [ContactController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/dashboard/refresh-cache', function () {
+        Cache::forget('total_contacts');
+        Cache::forget('recent_contacts');
+        return redirect()->route('dashboard')->with('success', 'Dashboard cache refreshed!');
+    })->name('dashboard.refresh')->middleware('auth');
 
     // Web Contact CRUD
     Route::resource('contacts', ContactController::class);

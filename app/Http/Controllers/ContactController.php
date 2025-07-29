@@ -30,7 +30,10 @@ class ContactController extends Controller {
         $totalContacts = Cache::remember('total_contacts', 600, fn () => Contact::count());
         $recentContacts = Cache::remember('recent_contacts', 600, fn () => Contact::latest()->take(5)->get());
 
-        return view('dashboard', compact('totalContacts', 'recentContacts'));
+        // Get last updated timestamp from most recent contact
+        $lastUpdated = $recentContacts->first()?->updated_at?->diffForHumans() ?? 'N/A';
+
+        return view('dashboard', compact('totalContacts', 'recentContacts', 'lastUpdated'));
     }
 
     // List contacts
