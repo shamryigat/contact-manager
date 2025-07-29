@@ -1,28 +1,31 @@
-# Use PHP with FPM
+# 1️⃣ Use official PHP image with extensions
 FROM php:8.3-fpm
 
-# Install system dependencies
+# 2️⃣ Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev libpng-dev libonig-dev libxml2-dev zip curl npm \
-    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd
+    git unzip libpq-dev libpng-dev libzip-dev libonig-dev curl \
+    && docker-php-ext-install pdo pdo_pgsql zip mbstring exif pcntl bcmath gd
 
-# Install Composer
-COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
+# 3️⃣ Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /var/www
+# 4️⃣ Set working directory
+WORKDIR /var/www/html
 
-# Copy project files
+# 5️⃣ Copy project files
 COPY . .
 
-# Install PHP dependencies
+# 6️⃣ Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Install Node dependencies and build frontend (Vite)
+# 7️⃣ Build frontend assets
 RUN npm install && npm run build
 
-# Expose port
+# 8️⃣ Set permissions for Laravel
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+# 9️⃣ Expose port
 EXPOSE 8080
 
-# Start Laravel server
+# 🔟 Start Laravel with PHP's built-in server
 CMD php artisan serve --host=0.0.0.0 --port=8080
