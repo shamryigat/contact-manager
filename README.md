@@ -1,61 +1,214 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📇 Contact Manager (Laravel 11 + Sanctum + Docker)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A simple **Contact Management System** built with **Laravel 11**, featuring:
+✅ Contact CRUD (Create, Read, Update, Delete)
+✅ File Upload (Contact Photo)
+✅ Email Notifications
+✅ Logging (Custom Log File)
+✅ Dashboard with Caching
+✅ REST API with Sanctum Authentication
+✅ Laravel Sail (Docker-based local dev environment)
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### ✅ Web Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* 👤 User authentication (Laravel Breeze)
+* 📇 Manage contacts (CRUD)
+* 📤 Upload contact photo
+* 📧 Email notifications on new contact creation
+* 📝 Custom logging of contact events (`storage/logs/contact.log`)
+* 📊 Dashboard with cached statistics and cache refresh button
 
-## Learning Laravel
+### ✅ API Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+* 🔐 API authentication using Laravel Sanctum
+* 📄 Fully protected `/api/contacts` CRUD endpoints
+* 🔑 API token-based login & logout
+* 📌 Endpoints for registration, login, logout, and contacts management
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🛠️ Installation (Laravel Sail + Docker)
 
-## Laravel Sponsors
+### 1️⃣ Clone the repository
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+git clone https://github.com/shamryigat/contact-manager.git
+cd contact-manager
+```
 
-### Premium Partners
+### 2️⃣ Install dependencies
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+composer install
+npm install && npm run build
+```
 
-## Contributing
+### 3️⃣ Copy environment file
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+cp .env.example .env
+```
 
-## Code of Conduct
+Update your `.env` file (database, mail, app URL).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4️⃣ Start Docker (Laravel Sail)
 
-## Security Vulnerabilities
+```bash
+./vendor/bin/sail up -d
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5️⃣ Generate app key
 
-## License
+```bash
+./vendor/bin/sail artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 6️⃣ Run migrations & storage link
+
+```bash
+./vendor/bin/sail artisan migrate
+./vendor/bin/sail artisan storage:link
+```
+
+---
+
+## 🔑 API Authentication (Laravel Sanctum)
+
+### 📌 1. Register a new user
+
+```bash
+POST /api/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password",
+  "password_confirmation": "password"
+}
+```
+
+✅ Response:
+
+```json
+{
+  "user": { "id": 1, "name": "John Doe", "email": "john@example.com" },
+  "token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+```
+
+---
+
+### 📌 2. Login to get API Token
+
+```bash
+POST /api/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password"
+}
+```
+
+✅ Response:
+
+```json
+{
+  "user": { ... },
+  "token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+```
+
+---
+
+### 📌 3. Use Bearer Token for API Requests
+
+Example:
+
+```bash
+GET /api/contacts
+Authorization: Bearer 1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+---
+
+### 📌 4. Logout
+
+```bash
+POST /api/logout
+Authorization: Bearer 1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+✅ Response:
+
+```json
+{ "message": "Logged out" }
+```
+
+---
+
+### 📌 API Endpoints
+
+| Method | Endpoint             | Auth Required | Description         |
+| ------ | -------------------- | ------------- | ------------------- |
+| POST   | `/api/register`      | ❌             | Register user       |
+| POST   | `/api/login`         | ❌             | Login and get token |
+| GET    | `/api/contacts`      | ✅             | List contacts       |
+| POST   | `/api/contacts`      | ✅             | Create contact      |
+| GET    | `/api/contacts/{id}` | ✅             | Show contact        |
+| PUT    | `/api/contacts/{id}` | ✅             | Update contact      |
+| DELETE | `/api/contacts/{id}` | ✅             | Delete contact      |
+| POST   | `/api/logout`        | ✅             | Logout user         |
+
+---
+
+## 📊 Dashboard Features
+
+* Shows **total contacts**, **recently added**, **last updated**
+* Cached for 10 minutes
+* "🔄 Refresh Cache" button to clear cache
+
+---
+
+## 📨 Email Notifications
+
+* When a new contact is created, an email is sent to the logged-in user
+* Email events are **logged in `storage/logs/contact.log`**
+
+---
+
+## 📝 Logging
+
+Custom log file:
+
+```
+storage/logs/contact.log
+```
+
+Logs events for:
+✅ Contact Created
+✅ Contact Updated
+✅ Contact Deleted
+
+---
+
+## 📦 Deployment
+
+* You can deploy this app on any hosting that supports **PHP 8.2+ & MySQL**
+* For free hosting, use **Render**, **Railway**, or **Laravel Forge** (paid)
+
+---
+
+## 📜 License
+
+MIT License – free to use and modify.
+
+---
+
+🔥 **Do you want me to also include a *"Quick Start API Testing with Postman / Curl"* section and a **visual API flow diagram** in the README?**
+This would make your GitHub project look more **professional for job applications.**
