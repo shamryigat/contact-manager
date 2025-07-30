@@ -10,10 +10,10 @@ RUN apk add --no-cache \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
-WORKDIR /var/www
+WORKDIR /var/www/html
 
 # Copy project files
-COPY . .
+COPY . /var/www/html
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
@@ -27,11 +27,15 @@ RUN apk add --no-cache nodejs npm \
 # Set permissions for Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Generate optimized caches (except APP_KEY – must be set in Render)
-RUN php artisan config:clear && php artisan route:clear && php artisan view:clear
+# Clear caches safely (won't fail if env is missing)
+RUN if [ -f artisan ]; then \
+    php artisan config:clear || true && \
+    php artisan route:clear || true && \
+    php artisan view:clear || true; \
+fi
 
 # Expose port
 EXPOSE 8080
 
-# Start Laravel server
+# Start Laravel server with migrations and storage link
 CMD ["sh", "-c", "php artisan migrate --force && php artisan storage:link || true && php artisan serve --host=0.0.0.0 --port=8080"]

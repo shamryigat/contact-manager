@@ -15,17 +15,44 @@ services:
         value: https://contact-manager-1lyk.onrender.com
       - key: DB_CONNECTION
         value: pgsql
-      - key: DB_HOST
-        value: dpg-d24dnuruibrs73aiollg-a.singapore-postgres.render.com
-      - key: DB_PORT
-        value: 5432
-      - key: DB_DATABASE
-        value: contactdb_4k5r
-      - key: DB_USERNAME
-        value: contactdb_4k5r_user
-      - key: DB_PASSWORD
-        sync: ZW3wQa7qtgTpWDnviwQzMjaXt8mAJOMU
+      - key: DATABASE_URL
+        value: postgresql://contactdb_4k5r_user:ZW3wQa7qtgTpWDnviwQzMjaXt8mAJOMU@dpg-d24dnuruibrs73aiollg-a/contactdb_4k5r
       - key: SESSION_DRIVER
         value: database
       - key: CACHE_STORE
         value: database
+      - key: SESSION_DOMAIN
+        value: .onrender.com
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USERNAME
+        value: shamryigat@gmail.com
+      - key: MAIL_PASSWORD
+        sync: maiclohpprghhhtx
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: MAIL_FROM_ADDRESS
+        value: shamryigat@gmail.com
+      - key: MAIL_FROM_NAME
+        value: Contact Manager
+      - key: APP_NAME
+        value: Contact Manager
+      - key: APP_LOCALE
+        value: en
+      - key: APP_FALLBACK_LOCALE
+        value: en
+      - key: LOG_CHANNEL
+        value: stack
+      - key: LOG_LEVEL
+        value: debug
+      - key: SESSION_LIFETIME
+        value: 120
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: local
+
