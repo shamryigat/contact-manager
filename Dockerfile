@@ -1,42 +1,42 @@
-# Use official PHP 8.3 image with required extensions
+# ✅ Use official PHP 8.3 image with required extensions
 FROM php:8.3-fpm-alpine
 
-# Install system dependencies and PHP extensions
+# ✅ Install system dependencies and PHP extensions
 RUN apk add --no-cache \
     bash curl git unzip libpng-dev libjpeg-turbo-dev libwebp-dev libzip-dev postgresql-dev oniguruma-dev \
     && docker-php-ext-install pdo pdo_pgsql mbstring zip bcmath gd
 
-# Install Composer
+# ✅ Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# ✅ Set working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# ✅ Copy project files
 COPY . /var/www/html
 
-# Install PHP dependencies
+# ✅ Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Build frontend assets
+# ✅ Build frontend assets
 RUN apk add --no-cache nodejs npm \
     && npm install \
     && npm run build \
     && rm -rf node_modules
 
-# ✅ Ensure Laravel storage and cache directories exist & set correct permissions
-RUN mkdir -p storage bootstrap/cache \
+# ✅ Ensure Laravel storage and cache directories exist BEFORE build
+RUN mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
-# ✅ Clear caches safely (skip if artisan not found or env not ready)
+# ✅ Clear caches safely (won't fail if .env not ready)
 RUN if [ -f artisan ]; then \
       php artisan config:clear || true && \
       php artisan route:clear || true && \
       php artisan view:clear || true; \
     fi
 
-# Expose port
+# ✅ Expose port for Render
 EXPOSE 8080
 
-# ✅ FINAL FIX: Ensure permissions again at runtime
-CMD ["sh", "-c", "chown -R www-data:www-data storage bootstrap/cache && php artisan migrate --force && php artisan storage:link || true && php artisan serve --host=0.0.0.0 --port=8080"]
+# ✅ Final CMD: Ensure folders exist, fix permissions, run migrations, create storage link, start Laravel
+CMD ["sh", "-c", "mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache && php artisan migrate --force && php artisan storage:link || true && php artisan serve --host=0.0.0.0 --port=8080"]

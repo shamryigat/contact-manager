@@ -5,12 +5,9 @@
 Dockerfile
 docker-compose.yml
 
-# Logs and caches
+# Logs (but keep storage/framework folders!)
 *.log
-storage/logs
-storage/framework/cache
-storage/framework/sessions
-storage/framework/views
+storage/logs/*.log
 
 # Environment files
 .env
@@ -36,7 +33,6 @@ storage/framework/views
 # Build artifacts
 /public/build
 /public/hot
-/public/storage
 
 # Others
 Homestead.json
