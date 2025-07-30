@@ -24,18 +24,19 @@ RUN apk add --no-cache nodejs npm \
     && npm run build \
     && rm -rf node_modules
 
-# Set permissions for Laravel
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# ✅ Ensure Laravel storage and cache directories exist & set correct permissions
+RUN mkdir -p storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
 
-# Clear caches safely (won't fail if env is missing)
+# ✅ Clear caches safely (skip if artisan not found or env not ready)
 RUN if [ -f artisan ]; then \
-    php artisan config:clear || true && \
-    php artisan route:clear || true && \
-    php artisan view:clear || true; \
-fi
+      php artisan config:clear || true && \
+      php artisan route:clear || true && \
+      php artisan view:clear || true; \
+    fi
 
 # Expose port
 EXPOSE 8080
 
-# Start Laravel server with migrations and storage link
+# ✅ Start Laravel server with migrations and storage link
 CMD ["sh", "-c", "php artisan migrate --force && php artisan storage:link || true && php artisan serve --host=0.0.0.0 --port=8080"]
