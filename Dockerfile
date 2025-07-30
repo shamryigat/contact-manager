@@ -38,5 +38,5 @@ RUN if [ -f artisan ]; then \
 # Expose port
 EXPOSE 8080
 
-# ✅ Start Laravel server with migrations and storage link
-CMD ["sh", "-c", "php artisan migrate --force && php artisan storage:link || true && php artisan serve --host=0.0.0.0 --port=8080"]
+# ✅ FINAL FIX: Ensure permissions again at runtime
+CMD ["sh", "-c", "chown -R www-data:www-data storage bootstrap/cache && php artisan migrate --force && php artisan storage:link || true && php artisan serve --host=0.0.0.0 --port=8080"]
