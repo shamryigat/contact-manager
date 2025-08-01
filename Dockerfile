@@ -39,4 +39,11 @@ RUN if [ -f artisan ]; then \
 EXPOSE 8080
 
 # ✅ Final CMD: Ensure folders exist, fix permissions, run migrations, create storage link, start Laravel
-CMD ["sh", "-c", "mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache && php artisan migrate --force && php artisan storage:link || true && php artisan serve --host=0.0.0.0 --port=8080"]
+CMD ["sh", "-c", "mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache && \
+                    chown -R www-data:www-data storage bootstrap/cache && \
+                    php artisan migrate --force && \
+                    php artisan config:cache && \
+                    php artisan route:cache && \
+                    php artisan view:cache && \
+                    if [ ! -L public/storage ]; then php artisan storage:link; fi && \
+                    php artisan serve --host=0.0.0.0 --port=8080"]
