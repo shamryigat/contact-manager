@@ -3,109 +3,116 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contact;
-use App\Http\Requests\ContactRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Cache;
 
-class ContactController extends Controller {
-    // Method to clear cached dashboard data
-    private function refreshDashboardCache(){
-        Cache::forget('total_contacts');
-        Cache::forget('recent_contacts');
-    }
+class ContactController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Contact::query();
 
-    // Method to log events
-    private function logEvent(string $action, Contact $contact){
-        \Log::channel('contact')->info("Contact {$action}", [
-            'user' => auth()->user()->email,
-            'contact_id' => $contact->id,
-            'name' => $contact->name,
-            'email' => $contact->email,
+        // 🔍 Search
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('email', 'like', "%{$request->search}%")
+                  ->orWhere('phone', 'like', "%{$request->search}%")
+                  ->orWhere('company', 'like', "%{$request->search}%");
+            });
+        }
+
+        // 🔽 Sorting
+        $allowedSort = ['name', 'email', 'phone', 'company', 'created_at'];
+        $sort = $request->get('sort', 'name');
+        $direction = $request->get('direction', 'asc');
+
+        if (!in_array($sort, $allowedSort)) $sort = 'name';
+        if (!in_array($direction, ['asc', 'desc'])) $direction = 'asc';
+
+        $contacts = $query->orderBy($sort, $direction)->paginate(10)->appends($request->query());
+
+        return view('dashboard', [
+            'contacts' => $contacts,
+            'contactsCount' => Contact::count(),
+            'contactsAddedToday' => Contact::whereDate('created_at', today())->count(),
+            'lastUpdatedContact' => Contact::latest('updated_at')->first(),
+            'sort' => $sort,
+            'direction' => $direction,
+            'search' => $request->search,
         ]);
     }
 
-    // Dashboard
-    public function dashboard(){
-        $totalContacts = Cache::remember('total_contacts', 600, fn () => Contact::count());
-        $recentContacts = Cache::remember('recent_contacts', 600, fn () => Contact::latest()->take(5)->get());
-
-        // Get last updated timestamp from most recent contact
-        $lastUpdated = $recentContacts->first()?->updated_at?->diffForHumans() ?? 'N/A';
-
-        return view('dashboard', compact('totalContacts', 'recentContacts', 'lastUpdated'));
-    }
-
-    // List contacts
-    public function index(Request $request){
-        $search = $request->query('search');
-        $contacts = Contact::when($search, fn ($query, $search) =>
-            $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-        )->paginate(10);
-
-        return view('contacts.index', compact('contacts', 'search'));
-    }
-
-    // Show create form
-    public function create(){
+    public function create()
+    {
         return view('contacts.create');
     }
 
-    // Store new contact
-    public function store(ContactRequest $request){
-        $data = $request->validated();
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'company' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-        if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('contacts', 'public');
+        if ($request->hasFile('profile_picture')) {
+            $data['profile_picture'] = $request->file('profile_picture')->storeAs(
+                'profile_pictures',
+                uniqid() . '.' . $request->file('profile_picture')->getClientOriginalExtension(),
+                'public'
+            );
         }
 
-        $contact = Contact::create($data);
+        Contact::create($data);
 
-        $this->refreshDashboardCache();
-
-        \Mail::to(auth()->user()->email)->send(new \App\Mail\ContactCreatedMail($contact));
-
-        $this->logEvent('created', $contact);
-
-        return redirect()->route('contacts.index')->with('success', 'Contact created successfully!');
+        return redirect()->route('dashboard')->with('success', 'Contact added!');
     }
 
-    // Show edit form
-    public function edit(Contact $contact){
+    public function edit(Contact $contact)
+    {
         return view('contacts.edit', compact('contact'));
     }
 
-    // Update contact
-    public function update(ContactRequest $request, Contact $contact){
-        $data = $request->validated();
+    public function update(Request $request, Contact $contact)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'company' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-        if ($request->hasFile('photo')) {
-            if ($contact->photo_path) {
-                Storage::disk('public')->delete($contact->photo_path);
+        if ($request->hasFile('profile_picture')) {
+            if ($contact->profile_picture) {
+                Storage::disk('public')->delete($contact->profile_picture);
             }
-            $data['photo_path'] = $request->file('photo')->store('contacts', 'public');
+
+            $data['profile_picture'] = $request->file('profile_picture')->storeAs(
+                'profile_pictures',
+                uniqid() . '.' . $request->file('profile_picture')->getClientOriginalExtension(),
+                'public'
+            );
         }
 
         $contact->update($data);
 
-        $this->refreshDashboardCache();
-        $this->logEvent('updated', $contact);
-
-        return redirect()->route('contacts.index')->with('success', 'Contact updated successfully!');
+        return redirect()->route('dashboard')->with('success', 'Contact updated!');
     }
 
-    // Delete contact
-    public function destroy(Contact $contact){
-        if ($contact->photo_path) {
-            Storage::disk('public')->delete($contact->photo_path);
+    public function destroy(Contact $contact)
+    {
+        if ($contact->profile_picture) {
+            Storage::disk('public')->delete($contact->profile_picture);
         }
 
         $contact->delete();
 
-        $this->refreshDashboardCache();
-        $this->logEvent('deleted', $contact);
-
-        return redirect()->route('contacts.index')->with('success', 'Contact deleted successfully!');
+        return redirect()->route('dashboard')->with('success', 'Contact deleted!');
     }
 }

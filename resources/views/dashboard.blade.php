@@ -1,104 +1,80 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
-
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            <!-- 🔹 Cache Info -->
-            <div class="flex justify-between items-center mb-4">
-                <p class="text-sm text-gray-500">
-                    <strong>Last Updated:</strong> {{ $lastUpdated }}
-                </p>
-                <a href="{{ route('dashboard.refresh') }}" 
-                   class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                    Refresh Cache
-                </a>
-            </div>
-
-            <!-- 🔹 Summary Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <div class="bg-white shadow rounded-lg p-4 text-center">
-                    <h3 class="text-gray-500 text-sm">Total Contacts</h3>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalContacts }}</p>
+            <!-- ✅ Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
+                    <div class="bg-blue-100 text-blue-600 p-3 rounded-full">👥</div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Contacts</p>
+                        <p class="text-2xl font-bold">{{ $contactsCount ?? 0 }}</p>
+                    </div>
                 </div>
 
-                <div class="bg-white shadow rounded-lg p-4 text-center">
-                    <h3 class="text-gray-500 text-sm">Recently Added</h3>
-                    <p class="text-3xl font-bold text-gray-800">{{ $recentContacts->count() }}</p>
+                <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
+                    <div class="bg-green-100 text-green-600 p-3 rounded-full">➕</div>
+                    <div>
+                        <p class="text-sm text-gray-500">Added Today</p>
+                        <p class="text-2xl font-bold">{{ $contactsAddedToday }}</p>
+                    </div>
                 </div>
 
-                <div class="bg-white shadow rounded-lg p-4 text-center">
-                    <h3 class="text-gray-500 text-sm">Last Updated</h3>
-                    <p class="text-3xl font-bold text-gray-800">
-                        {{ $recentContacts->first()?->name ?? 'N/A' }}
-                    </p>
-                </div>
-            </div>
-
-            <!-- 🔹 Recent Contacts Table -->
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-                <div class="p-4 border-b">
-                    <h3 class="text-lg font-semibold">Recent Contacts</h3>
+                <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
+                    <div class="bg-yellow-100 text-yellow-600 p-3 rounded-full">⏰</div>
+                    <div>
+                        <p class="text-sm text-gray-500">Last Updated</p>
+                        <p class="text-lg font-semibold">
+                            {{ $lastUpdatedContact ? $lastUpdatedContact->updated_at->diffForHumans() : 'N/A' }}
+                        </p>
+                    </div>
                 </div>
 
-                <table class="w-full border-collapse">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="border p-3 text-left">Photo</th>
-                            <th class="border p-3 text-left">Name</th>
-                            <th class="border p-3 text-left">Email</th>
-                            <th class="border p-3 text-left">Company</th>
-                            <th class="border p-3 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($recentContacts as $contact)
-                            <tr class="hover:bg-gray-50">
-                                <td class="border p-3">
-                                    @if($contact->photo_path)
-                                        <img src="{{ asset('storage/'.$contact->photo_path) }}" 
-                                             class="w-10 h-10 rounded-full object-cover">
-                                    @else
-                                        <span class="text-gray-400">No Photo</span>
-                                    @endif
-                                </td>
-                                <td class="border p-3">{{ $contact->name }}</td>
-                                <td class="border p-3">{{ $contact->email ?? '-' }}</td>
-                                <td class="border p-3">{{ $contact->company ?? '-' }}</td>
-                                <td class="border p-3 text-center">
-                                    <a href="{{ route('contacts.edit', $contact) }}" 
-                                       class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Edit</a>
-                                    <form action="{{ route('contacts.destroy', $contact) }}" 
-                                          method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button onclick="return confirm('Delete this contact?')" 
-                                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                                            Delete
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="border p-4 text-center text-gray-500">No recent contacts.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
+                    <div class="bg-purple-100 text-purple-600 p-3 rounded-full">👤</div>
+                    <div>
+                        <p class="text-sm text-gray-500">Last Updated Contact</p>
+                        <p class="text-lg font-semibold">
+                            {{ $lastUpdatedContact->name ?? 'N/A' }}
+                        </p>
+                    </div>
+                </div>
             </div>
+            
+<!-- ✅ Search, Sort, and Add Contact in One Row -->
+<div class="mb-4 flex justify-between items-center">
+    <!-- 🔍 Search & Sort -->
+    <form method="GET" action="{{ route('dashboard') }}" class="flex gap-2">
+        <input type="text" name="search" placeholder="Search..."
+            value="{{ request('search') }}"
+            class="border rounded-lg p-2 w-64">
 
-            <!-- 🔹 Quick Actions -->
-            <div class="mt-4">
-                <a href="{{ route('contacts.create') }}" 
-                   class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">+ Add New Contact</a>
-                <a href="{{ route('contacts.index') }}" 
-                   class="ml-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">View All Contacts</a>
-            </div>
+        <select name="sort" class="border rounded-lg p-2 w-48">
+            <option value="name" {{ request('sort')=='name'?'selected':'' }}>Sort by Name</option>
+            <option value="email" {{ request('sort')=='email'?'selected':'' }}>Sort by Email</option>
+            <option value="created_at" {{ request('sort')=='created_at'?'selected':'' }}>Sort by Created</option>
+        </select>
+
+        <select name="direction" class="border rounded-lg p-2 w-48">
+            <option value="asc" {{ request('direction')=='asc'?'selected':'' }}>Ascending</option>
+            <option value="desc" {{ request('direction')=='desc'?'selected':'' }}>Descending</option>
+        </select>
+
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+            Apply
+        </button>
+    </form>
+
+    <!-- ➕ Add Contact Button -->
+    <a href="{{ route('contacts.create') }}"
+       class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+        ➕ Add Contact
+    </a>
+</div>
+
+            <!-- ✅ Contacts Table -->
+            @include('contacts.partials.table', ['contacts' => $contacts])
+
         </div>
     </div>
 </x-app-layout>

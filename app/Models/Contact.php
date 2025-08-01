@@ -15,6 +15,6 @@ class Contact extends Model
         'phone',
         'company',
         'notes',
-        'photo_path',
+        'profile_picture',
     ];
 }

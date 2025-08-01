@@ -5,78 +5,75 @@
         </h2>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-md rounded-lg p-6">
+    <div class="py-6 max-w-3xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white shadow-md rounded-xl p-6">
+            <form id="contactForm" method="POST" action="{{ route('contacts.store') }}" enctype="multipart/form-data" class="space-y-5">
+                @csrf
 
-                <!-- 🔹 Validation Errors -->
-                @if ($errors->any())
-                    <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>• {{ $error }}</li>
-                            @endforeach
-                        </ul>
+                <!-- Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" name="name" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500" required>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" name="email" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input type="text" name="phone" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- Company -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                    <input type="text" name="company" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- Profile Picture -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
+                    <input type="file" name="profile_picture" id="profile_picture" class="w-full text-sm border rounded-lg p-2 bg-gray-50">
+                    <div id="preview-container" class="mt-3 hidden">
+                        <p class="text-sm text-gray-600 mb-1">Preview:</p>
+                        <img id="preview-image" class="h-20 w-20 rounded-full object-cover border">
                     </div>
-                @endif
+                </div>
 
-                <form action="{{ route('contacts.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+                <!-- Notes -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <textarea name="notes" rows="4" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
 
-                    <!-- Name -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Name *</label>
-                        <input type="text" name="name" value="{{ old('name') }}"
-                               class="w-full border rounded-lg px-3 py-2"
-                               required>
-                    </div>
-
-                    <!-- Email -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Email</label>
-                        <input type="email" name="email" value="{{ old('email') }}"
-                               class="w-full border rounded-lg px-3 py-2">
-                    </div>
-
-                    <!-- Phone -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Phone</label>
-                        <input type="text" name="phone" value="{{ old('phone') }}"
-                               class="w-full border rounded-lg px-3 py-2">
-                    </div>
-
-                    <!-- Company -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Company</label>
-                        <input type="text" name="company" value="{{ old('company') }}"
-                               class="w-full border rounded-lg px-3 py-2">
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Notes</label>
-                        <textarea name="notes" rows="3" 
-                                  class="w-full border rounded-lg px-3 py-2">{{ old('notes') }}</textarea>
-                    </div>
-
-                    <!-- Photo -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Photo</label>
-                        <input type="file" name="photo" 
-                               class="w-full border rounded-lg px-3 py-2">
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="flex justify-between">
-                        <a href="{{ route('contacts.index') }}" 
-                           class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Cancel</a>
-
-                        <button type="submit" 
-                                class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Save Contact</button>
-                    </div>
-                </form>
-
-            </div>
+                <!-- Buttons -->
+                <div class="flex justify-end gap-3">
+                    <a href="{{ route('dashboard') }}" class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">Cancel</a>
+                    <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">Save Contact</button>
+                </div>
+            </form>
         </div>
     </div>
+
+    <!-- Profile Picture Preview Script -->
+    <script>
+        document.getElementById("profile_picture").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const previewContainer = document.getElementById("preview-container");
+            const previewImage = document.getElementById("preview-image");
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+                previewContainer.classList.remove("hidden");
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
 </x-app-layout>

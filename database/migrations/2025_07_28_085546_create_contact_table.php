@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->string('phone')->nullable();
             $table->string('company')->nullable();
             $table->text('notes')->nullable();
-            $table->string('photo_path')->nullable();
+            $table->string('profile_picture')->nullable();
             $table->timestamps();
         });
     }

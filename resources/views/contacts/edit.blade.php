@@ -5,86 +5,60 @@
         </h2>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-md rounded-lg p-6">
+    <div class="py-6 max-w-3xl mx-auto sm:px-6 lg:px-8">
+        <form method="POST" action="{{ route('contacts.update', $contact) }}" enctype="multipart/form-data" class="bg-white shadow rounded-lg p-6">
+            @csrf
+            @method('PUT')
 
-                <!-- 🔹 Validation Errors -->
-                @if ($errors->any())
-                    <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>• {{ $error }}</li>
-                            @endforeach
-                        </ul>
+            <!-- Name -->
+            <div class="mb-4">
+                <label class="block font-medium">Name</label>
+                <input type="text" name="name" value="{{ old('name', $contact->name) }}" class="border rounded w-full p-2" required>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+                <label class="block font-medium">Email</label>
+                <input type="email" name="email" value="{{ old('email', $contact->email) }}" class="border rounded w-full p-2">
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-4">
+                <label class="block font-medium">Phone</label>
+                <input type="text" name="phone" value="{{ old('phone', $contact->phone) }}" class="border rounded w-full p-2">
+            </div>
+
+            <!-- Company -->
+            <div class="mb-4">
+                <label class="block font-medium">Company</label>
+                <input type="text" name="company" value="{{ old('company', $contact->company) }}" class="border rounded w-full p-2">
+            </div>
+
+            <!-- Notes -->
+            <div class="mb-4">
+                <label class="block font-medium">Notes</label>
+                <textarea name="notes" class="border rounded w-full p-2">{{ old('notes', $contact->notes) }}</textarea>
+            </div>
+
+            <!-- Profile Picture -->
+            <div class="mb-4">
+                <label class="block font-medium">Profile Picture</label>
+
+                @if($contact->profile_picture)
+                    <div class="mb-3">
+                        <img src="{{ asset('storage/' . $contact->profile_picture) }}" alt="Profile Picture" class="h-20 w-20 rounded-full object-cover border">
                     </div>
                 @endif
 
-                <form action="{{ route('contacts.update', $contact) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-
-                    <!-- Name -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Name *</label>
-                        <input type="text" name="name" value="{{ old('name', $contact->name) }}"
-                               class="w-full border rounded-lg px-3 py-2" required>
-                    </div>
-
-                    <!-- Email -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Email</label>
-                        <input type="email" name="email" value="{{ old('email', $contact->email) }}"
-                               class="w-full border rounded-lg px-3 py-2">
-                    </div>
-
-                    <!-- Phone -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Phone</label>
-                        <input type="text" name="phone" value="{{ old('phone', $contact->phone) }}"
-                               class="w-full border rounded-lg px-3 py-2">
-                    </div>
-
-                    <!-- Company -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Company</label>
-                        <input type="text" name="company" value="{{ old('company', $contact->company) }}"
-                               class="w-full border rounded-lg px-3 py-2">
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Notes</label>
-                        <textarea name="notes" rows="3" class="w-full border rounded-lg px-3 py-2">{{ old('notes', $contact->notes) }}</textarea>
-                    </div>
-
-                    <!-- Current Photo -->
-                    @if ($contact->photo_path)
-                        <div class="mb-4">
-                            <label class="block text-gray-700 font-medium">Current Photo</label>
-                            <img src="{{ asset('storage/'.$contact->photo_path) }}" 
-                                 class="w-20 h-20 rounded-full object-cover mb-2">
-                        </div>
-                    @endif
-
-                    <!-- New Photo -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium">Replace Photo</label>
-                        <input type="file" name="photo" 
-                               class="w-full border rounded-lg px-3 py-2">
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="flex justify-between">
-                        <a href="{{ route('contacts.index') }}" 
-                           class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Cancel</a>
-
-                        <button type="submit" 
-                                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Update Contact</button>
-                    </div>
-                </form>
-
+                <input type="file" name="profile_picture" class="border rounded w-full p-2">
+                <p class="text-sm text-gray-500 mt-1">Leave blank to keep the current picture.</p>
             </div>
-        </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Update Contact</button>
+                <a href="{{ route('dashboard') }}" class="bg-gray-300 px-4 py-2 rounded">Cancel</a>
+            </div>
+        </form>
     </div>
 </x-app-layout>
