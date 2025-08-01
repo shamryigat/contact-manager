@@ -2,7 +2,7 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            <!-- ✅ Stats Cards -->
+            <!-- Stats Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
                     <div class="bg-blue-100 text-blue-600 p-3 rounded-full">👥</div>
@@ -41,9 +41,8 @@
                 </div>
             </div>
             
-<!-- ✅ Search, Sort, and Add Contact in One Row -->
+<!-- 🔍 Search & Sort -->
 <div class="mb-4 flex justify-between items-center">
-    <!-- 🔍 Search & Sort -->
     <form method="GET" action="{{ route('dashboard') }}" class="flex gap-2">
         <input type="text" name="search" placeholder="Search..."
             value="{{ request('search') }}"
@@ -65,14 +64,20 @@
         </button>
     </form>
 
-    <!-- ➕ Add Contact Button -->
-    <a href="{{ route('contacts.create') }}"
-       class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-        ➕ Add Contact
-    </a>
-</div>
+    <!-- ✅ Wrap both buttons inside a flex container -->
+    <div class="flex gap-2">
+        <a href="{{ route('contacts.create') }}"
+           class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+            Add Contact
+        </a>
 
-            <!-- ✅ Contacts Table -->
+        <a href="{{ route('contacts.export') }}"
+           class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+            Export to Excel
+        </a>
+    </div>
+</div>
+            <!-- Contacts Table -->
             @include('contacts.partials.table', ['contacts' => $contacts])
 
         </div>

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\ActivityLogger;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ContactListsExport;
 
 class ContactController extends Controller
 {
@@ -67,7 +70,12 @@ class ContactController extends Controller
             );
         }
 
-        Contact::create($data);
+        $newContact = Contact::create($data);
+
+        ActivityLogger::log('Added Contact', [
+            'old' => null,
+            'new' => $newContact->only(['name', 'email', 'phone', 'company', 'notes']),
+        ]);
 
         return redirect()->route('dashboard')->with('success', 'Contact added!');
     }
@@ -88,6 +96,9 @@ class ContactController extends Controller
             'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
+        // ✅ Store old data
+        $oldData = $contact->only(['name', 'email', 'phone', 'company', 'notes']);
+
         if ($request->hasFile('profile_picture')) {
             if ($contact->profile_picture) {
                 Storage::disk('public')->delete($contact->profile_picture);
@@ -102,17 +113,47 @@ class ContactController extends Controller
 
         $contact->update($data);
 
+        $newData = $contact->only(['name', 'email', 'phone', 'company', 'notes']);
+
+        $changedOld = [];
+        $changedNew = [];
+
+        foreach ($newData as $key => $value) {
+            if ($oldData[$key] !== $value) {
+                $changedOld[$key] = $oldData[$key];
+                $changedNew[$key] = $value;
+            }
+        }
+
+        if (!empty($changedNew)) {
+            ActivityLogger::log('Edited Contact', [
+                'old' => $changedOld,
+                'new' => $changedNew,
+            ]);
+        }
+
         return redirect()->route('dashboard')->with('success', 'Contact updated!');
     }
 
-    public function destroy(Contact $contact)
+    public function destroy(Contact $contact, Request $request)
     {
         if ($contact->profile_picture) {
             Storage::disk('public')->delete($contact->profile_picture);
         }
 
+        $oldData = $contact->only(['name', 'email', 'phone', 'company', 'notes']);
         $contact->delete();
 
+        ActivityLogger::log('Deleted Contact', [
+            'old' => $oldData,
+            'new' => null,
+        ]);
+
         return redirect()->route('dashboard')->with('success', 'Contact deleted!');
+    }
+
+    public function export()
+    {
+        return Excel::download(new ContactListsExport, 'contacts.xlsx');
     }
 }
