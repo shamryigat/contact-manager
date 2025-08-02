@@ -70,12 +70,13 @@ class ContactController extends Controller
             );
         }
 
-        $newContact = Contact::create($data);
+        $contact = Contact::create($data);
 
+        // ✅ Log + Send Email
         ActivityLogger::log('Added Contact', [
             'old' => null,
-            'new' => $newContact->only(['name', 'email', 'phone', 'company', 'notes']),
-        ]);
+            'new' => $contact->only(['name', 'email', 'phone', 'company', 'notes']),
+        ], $contact);
 
         return redirect()->route('dashboard')->with('success', 'Contact added!');
     }
@@ -96,7 +97,6 @@ class ContactController extends Controller
             'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        // ✅ Store old data
         $oldData = $contact->only(['name', 'email', 'phone', 'company', 'notes']);
 
         if ($request->hasFile('profile_picture')) {
@@ -113,8 +113,8 @@ class ContactController extends Controller
 
         $contact->update($data);
 
+        // ✅ Only log changed fields
         $newData = $contact->only(['name', 'email', 'phone', 'company', 'notes']);
-
         $changedOld = [];
         $changedNew = [];
 
@@ -129,25 +129,27 @@ class ContactController extends Controller
             ActivityLogger::log('Edited Contact', [
                 'old' => $changedOld,
                 'new' => $changedNew,
-            ]);
+            ], $contact);
         }
 
         return redirect()->route('dashboard')->with('success', 'Contact updated!');
     }
 
-    public function destroy(Contact $contact, Request $request)
+    public function destroy(Contact $contact)
     {
         if ($contact->profile_picture) {
             Storage::disk('public')->delete($contact->profile_picture);
         }
 
         $oldData = $contact->only(['name', 'email', 'phone', 'company', 'notes']);
-        $contact->delete();
 
+        // ✅ Log + Email before deletion
         ActivityLogger::log('Deleted Contact', [
             'old' => $oldData,
             'new' => null,
-        ]);
+        ], $contact);
+
+        $contact->delete();
 
         return redirect()->route('dashboard')->with('success', 'Contact deleted!');
     }
