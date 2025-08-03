@@ -16,11 +16,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard uses controller logic
     Route::get('/dashboard', [ContactController::class, 'index'])->name('dashboard');
 
-    // This route MUST come before the resource route
     Route::get('/contacts/export', [ContactController::class, 'export'])->name('contacts.export');
 
     // Contact CRUD
-    // We will use the apiResource method for simplicity and better naming
     Route::resource('contacts', ContactController::class);
     
     // Profile Routes
