@@ -21,6 +21,7 @@ class ContactListsExport implements FromCollection, WithHeadings, WithMapping
             $contact->email,
             $contact->phone,
             $contact->company,
+            $contact->address,
             $contact->notes,
             $contact->created_at->format('Y-m-d H:i:s'),
         ];

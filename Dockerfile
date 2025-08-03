@@ -41,7 +41,7 @@ EXPOSE 8080
 # ✅ Final CMD: Ensure folders exist, fix permissions, run migrations, create storage link, start Laravel
 CMD ["sh", "-c", "mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache && \
                     chown -R www-data:www-data storage bootstrap/cache && \
-                    php artisan migrate --force && \
+                    php artisan migrate:clear && \
                     php artisan config:cache && \
                     php artisan route:cache && \
                     php artisan view:cache && \

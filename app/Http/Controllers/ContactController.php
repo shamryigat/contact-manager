@@ -58,6 +58,7 @@ class ContactController extends Controller
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'company' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
             'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -75,7 +76,7 @@ class ContactController extends Controller
         // ✅ Log + Send Email
         ActivityLogger::log('Added Contact', [
             'old' => null,
-            'new' => $contact->only(['name', 'email', 'phone', 'company', 'notes']),
+            'new' => $contact->only(['name', 'email', 'phone', 'company', 'address', 'notes']),
         ], $contact);
 
         return redirect()->route('dashboard')->with('success', 'Contact added!');
@@ -93,11 +94,12 @@ class ContactController extends Controller
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'company' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
             'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $oldData = $contact->only(['name', 'email', 'phone', 'company', 'notes']);
+        $oldData = $contact->only(['name', 'email', 'phone', 'company', 'address', 'notes']);
 
         if ($request->hasFile('profile_picture')) {
             if ($contact->profile_picture) {
@@ -114,7 +116,7 @@ class ContactController extends Controller
         $contact->update($data);
 
         // ✅ Only log changed fields
-        $newData = $contact->only(['name', 'email', 'phone', 'company', 'notes']);
+        $newData = $contact->only(['name', 'email', 'phone', 'company', 'address', 'notes']);
         $changedOld = [];
         $changedNew = [];
 
@@ -141,7 +143,7 @@ class ContactController extends Controller
             Storage::disk('public')->delete($contact->profile_picture);
         }
 
-        $oldData = $contact->only(['name', 'email', 'phone', 'company', 'notes']);
+        $oldData = $contact->only(['name', 'email', 'phone', 'company', 'address', 'notes']);
 
         // ✅ Log + Email before deletion
         ActivityLogger::log('Deleted Contact', [

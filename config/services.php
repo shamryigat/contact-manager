@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'google_maps' => [
+        'key' => env('GOOGLE_MAPS_KEY', 'AIzaSyD19bgYJwBxSoXKIVOLpBINoD0HOT-bSrc'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
@@ -34,5 +38,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    
+    
 
 ];

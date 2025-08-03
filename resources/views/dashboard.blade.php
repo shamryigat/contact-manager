@@ -41,42 +41,42 @@
                 </div>
             </div>
             
-<!-- 🔍 Search & Sort -->
-<div class="mb-4 flex justify-between items-center">
-    <form method="GET" action="{{ route('dashboard') }}" class="flex gap-2">
-        <input type="text" name="search" placeholder="Search..."
-            value="{{ request('search') }}"
-            class="border rounded-lg p-2 w-64">
+            <!-- 🔍 Search & Sort -->
+            <div class="mb-4 flex justify-between items-center">
+                <form method="GET" action="{{ route('dashboard') }}" class="flex gap-2">
+                    <input type="text" name="search" placeholder="Search..."
+                        value="{{ request('search') }}"
+                        class="border rounded-lg p-2 w-64">
 
-        <select name="sort" class="border rounded-lg p-2 w-48">
-            <option value="name" {{ request('sort')=='name'?'selected':'' }}>Sort by Name</option>
-            <option value="email" {{ request('sort')=='email'?'selected':'' }}>Sort by Email</option>
-            <option value="created_at" {{ request('sort')=='created_at'?'selected':'' }}>Sort by Created</option>
-        </select>
+                    <select name="sort" class="border rounded-lg p-2 w-48">
+                        <option value="name" {{ request('sort')=='name'?'selected':'' }}>Sort by Name</option>
+                        <option value="email" {{ request('sort')=='email'?'selected':'' }}>Sort by Email</option>
+                        <option value="created_at" {{ request('sort')=='created_at'?'selected':'' }}>Sort by Created</option>
+                    </select>
 
-        <select name="direction" class="border rounded-lg p-2 w-48">
-            <option value="asc" {{ request('direction')=='asc'?'selected':'' }}>Ascending</option>
-            <option value="desc" {{ request('direction')=='desc'?'selected':'' }}>Descending</option>
-        </select>
+                    <select name="direction" class="border rounded-lg p-2 w-48">
+                        <option value="asc" {{ request('direction')=='asc'?'selected':'' }}>Ascending</option>
+                        <option value="desc" {{ request('direction')=='desc'?'selected':'' }}>Descending</option>
+                    </select>
 
-        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
-            Apply
-        </button>
-    </form>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                        Apply
+                    </button>
+                </form>
 
-    <!-- ✅ Wrap both buttons inside a flex container -->
-    <div class="flex gap-2">
-        <a href="{{ route('contacts.create') }}"
-           class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            Add Contact
-        </a>
+                <!-- ✅ Wrap both buttons inside a flex container -->
+                <div class="flex gap-2">
+                    <a href="{{ route('contacts.create') }}"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                        Add Contact
+                    </a>
 
-        <a href="{{ route('contacts.export') }}"
-           class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            Export to Excel
-        </a>
-    </div>
-</div>
+                    <a href="{{ route('contacts.export') }}"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                        Export to Excel
+                    </a>
+                </div>
+            </div>
             <!-- Contacts Table -->
             @include('contacts.partials.table', ['contacts' => $contacts])
 
