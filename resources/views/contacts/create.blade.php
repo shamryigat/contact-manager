@@ -51,8 +51,30 @@
 
                 <!-- Profile Picture -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Profile Picture [jpg,jpeg,png|max:2048]</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Profile Picture [Format: jpg,jpeg,png | Max: 5MB]
+                    </label>
                     <input type="file" name="profile_picture" id="profile_picture" class="w-full text-sm border rounded-lg p-2 bg-gray-50">
+                    
+                    <!-- Remove Selected Button -->
+                    <button type="button" id="remove-picture" 
+                        class="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hidden">
+                        Remove Selected Picture
+                    </button>
+
+                    <div id="preview-container" class="mt-3 hidden">
+                        <p class="text-sm text-gray-600 mb-1">Preview:</p>
+                        <img id="preview-image" class="h-20 w-20 rounded-full object-cover border">
+                    </div>
+
+                    <!-- Laravel validation error -->
+                    @error('profile_picture')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+
+                    <!-- Custom frontend validation error -->
+                    <p id="profile-error" class="text-red-500 text-sm mt-1 hidden"></p>
+
                     <div id="preview-container" class="mt-3 hidden">
                         <p class="text-sm text-gray-600 mb-1">Preview:</p>
                         <img id="preview-image" class="h-20 w-20 rounded-full object-cover border">
@@ -129,14 +151,60 @@
         // Initialize Map when page loads
         window.onload = initMap;
 
-        // Profile Picture Preview
         document.getElementById("profile_picture").addEventListener("change", function (event) {
             const file = event.target.files[0];
-            if (!file) return;
-
+            const removeBtn = document.getElementById("remove-picture");
+            const errorMsg = document.getElementById("profile-error");
             const previewContainer = document.getElementById("preview-container");
             const previewImage = document.getElementById("preview-image");
 
+            //remove button
+            fileInput.addEventListener("change", function (event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.classList.remove("hidden");
+                    removeBtn.classList.remove("hidden");
+                };
+                reader.readAsDataURL(file);
+            });
+
+            removeBtn.addEventListener("click", function () {
+                fileInput.value = "";
+                previewContainer.classList.add("hidden");
+                removeBtn.classList.add("hidden");
+            });
+
+            // Reset error message
+            errorMsg.classList.add("hidden");
+            errorMsg.textContent = "";
+
+            if (!file) return;
+
+            // Allowed formats
+            const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+            const maxSize = 5 * 1024 * 1024; // 5 MB
+
+            if (!allowedTypes.includes(file.type)) {
+                errorMsg.textContent = "Invalid file format. Please upload jpg, jpeg, or png.";
+                errorMsg.classList.remove("hidden");
+                event.target.value = ""; // Clear file input
+                previewContainer.classList.add("hidden");
+                return;
+            }
+
+            if (file.size > maxSize) {
+                errorMsg.textContent = "File size exceeds 5MB limit.";
+                errorMsg.classList.remove("hidden");
+                event.target.value = "";
+                previewContainer.classList.add("hidden");
+                return;
+            }
+
+            // Show preview if valid
             const reader = new FileReader();
             reader.onload = function (e) {
                 previewImage.src = e.target.result;

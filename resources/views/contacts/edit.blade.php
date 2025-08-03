@@ -58,17 +58,47 @@
 
             <!-- Profile Picture -->
             <div class="mb-4">
-                <label class="block font-medium">Profile Picture [jpg,jpeg,png|max:2048]</label>
+                <label class="block font-medium">Profile Picture [jpg,jpeg,png|max:5MB]</label>
 
                 @if($contact->profile_picture)
                     <div class="mb-3">
-                        <img src="{{ asset('storage/' . $contact->profile_picture) }}" alt="Profile Picture" class="h-20 w-20 rounded-full object-cover border">
+                        <img src="{{ asset('storage/' . $contact->profile_picture) }}" 
+                            class="h-20 w-20 rounded-full object-cover border">
                     </div>
+
+                    <!-- Remove Picture Checkbox -->
+                    <label class="flex items-center gap-2 text-sm text-red-600">
+                        <input type="checkbox" name="remove_picture" value="1">
+                        Remove Current Picture
+                    </label>
                 @endif
 
-                <input type="file" name="profile_picture" class="border rounded w-full p-2">
-                <p class="text-sm text-gray-500 mt-1">Leave blank to keep the current picture.</p>
+                <input type="file" name="profile_picture" id="profile_picture" class="border rounded w-full p-2">
+                <button type="button" id="remove-selected" 
+                    class="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hidden">
+                    Remove Selected Picture
+                </button>
+
+                <div id="preview-container" class="mt-3 hidden">
+                    <p class="text-sm text-gray-600 mb-1">Preview:</p>
+                    <img id="preview-image" class="h-20 w-20 rounded-full object-cover border">
+                </div>
             </div>
+
+            <!-- Backend Validation Error -->
+            @error('profile_picture')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+
+            <!-- Custom Frontend Error -->
+            <p id="profile-error" class="text-red-500 text-sm mt-1 hidden"></p>
+
+            <!-- Preview -->
+            <div id="preview-container" class="mt-3 hidden">
+                <p class="text-sm text-gray-600 mb-1">Preview:</p>
+                <img id="preview-image" class="h-20 w-20 rounded-full object-cover border">
+            </div>
+            {{-- </div> --}}
 
             <!-- Buttons -->
             <div class="flex gap-3">
@@ -127,5 +157,63 @@
         });
 
         window.onload = initMap;
+
+        document.getElementById("profile_picture").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            const removeBtn2 = document.getElementById("remove-selected");
+            const errorMsg = document.getElementById("profile-error");
+            const previewContainer = document.getElementById("preview-container");
+            const previewImage = document.getElementById("preview-image");
+
+            fileInput2.addEventListener("change", function (event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage2.src = e.target.result;
+                    previewContainer2.classList.remove("hidden");
+                    removeBtn2.classList.remove("hidden");
+                };
+                reader.readAsDataURL(file);
+            });
+
+            removeBtn2.addEventListener("click", function () {
+                fileInput2.value = "";
+                previewContainer2.classList.add("hidden");
+                removeBtn2.classList.add("hidden");
+            });
+
+            // Reset
+            errorMsg.classList.add("hidden");
+            errorMsg.textContent = "";
+            previewContainer.classList.add("hidden");
+
+            if (!file) return;
+
+            const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+
+            if (!allowedTypes.includes(file.type)) {
+                errorMsg.textContent = "Invalid file format. Please upload jpg, jpeg, or png.";
+                errorMsg.classList.remove("hidden");
+                event.target.value = "";
+                return;
+            }
+
+            if (file.size > maxSize) {
+                errorMsg.textContent = "File size exceeds 5MB limit.";
+                errorMsg.classList.remove("hidden");
+                event.target.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+                previewContainer.classList.remove("hidden");
+            };
+            reader.readAsDataURL(file);
+        });
     </script>
 </x-app-layout>

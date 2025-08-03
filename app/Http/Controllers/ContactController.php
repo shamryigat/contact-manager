@@ -66,7 +66,7 @@ class ContactController extends Controller
             'company' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
-            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         if ($request->hasFile('profile_picture')) {
@@ -102,7 +102,7 @@ class ContactController extends Controller
             'company' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
-            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $oldData = $contact->only(['name', 'email', 'phone', 'company', 'address', 'notes']);
@@ -117,6 +117,13 @@ class ContactController extends Controller
                 uniqid() . '.' . $request->file('profile_picture')->getClientOriginalExtension(),
                 'public'
             );
+        }
+
+        if ($request->has('remove_picture') && $request->remove_picture == '1') {
+            if ($contact->profile_picture) {
+                Storage::disk('public')->delete($contact->profile_picture);
+                $data['profile_picture'] = null; // Remove from DB
+            }
         }
 
         $contact->update($data);

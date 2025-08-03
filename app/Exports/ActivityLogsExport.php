@@ -11,52 +11,54 @@ class ActivityLogsExport implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return ActivityLog::latest()->get(); // Get all logs
+        return ActivityLog::latest()->get();
     }
 
     public function map($log): array
     {
-        // Convert JSON details into a readable string
-        $details = $log->details;
+        // Decode details JSON
+        $details = is_string($log->details) 
+            ? json_decode($log->details, true) 
+            : $log->details;
 
-        if (is_string($details)) {
-            $details = json_decode($details, true) ?: [];
-        }
-
-        $detailsText = '';
-        $name = isset($details['name']) ? $details['name'] : 'Unknown';
-
-        if ($log->action === 'Edited Contact') {
-            $fields = [];
-
-            foreach ($details as $key => $value) {
-                if ($key !== 'name') {
-                    $fields[] = ucfirst($key);
-                }
-            }
-
-            $fieldsText = implode(', ', $fields);
-            $detailsText = "Edited [$fieldsText] on contact [$name]";
-
-        } elseif ($log->action === 'Added Contact') {
-            $detailsText = "Added new contact [$name]";
-
-        } elseif ($log->action === 'Deleted Contact') {
-            $detailsText = "Deleted contact [$name]";
-
-        } else {
-            $detailsText = json_encode($details);
-        }
+        $old = $details['old'] ?? [];
+        $new = $details['new'] ?? [];
 
         return [
             $log->action,
-            $detailsText,
+            $old['name'] ?? '',
+            $old['email'] ?? '',
+            $old['phone'] ?? '',
+            $old['company'] ?? '',
+            $old['address'] ?? '',
+            $old['notes'] ?? '',
+            $new['name'] ?? '',
+            $new['email'] ?? '',
+            $new['phone'] ?? '',
+            $new['company'] ?? '',
+            $new['address'] ?? '',
+            $new['notes'] ?? '',
             $log->created_at->format('Y-m-d H:i:s'),
         ];
     }
 
     public function headings(): array
     {
-        return ['Action', 'Details', 'Date'];
+        return [
+            'Action',
+            'Old Name',
+            'Old Email',
+            'Old Phone',
+            'Old Company',
+            'Old Address',
+            'Old Notes',
+            'New Name',
+            'New Email',
+            'New Phone',
+            'New Company',
+            'New Address',
+            'New Notes',
+            'Timestamp',
+        ];
     }
 }
