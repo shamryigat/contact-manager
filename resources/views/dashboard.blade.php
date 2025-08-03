@@ -62,7 +62,14 @@
                            class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 w-full sm:w-auto text-center">
                             Export to Excel
                         </a>
+                        <form action="{{ route('dashboard.refresh-cache') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+                                Refresh Cache
+                            </button>
+                        </form>
                     </div>
+                    
                 </div>
             </div>
 

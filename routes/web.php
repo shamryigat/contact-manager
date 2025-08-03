@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HistoryController;
 use App\Exports\ActivityLogsExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Cache;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -34,5 +35,12 @@ Route::get('/history', [HistoryController::class, 'index'])
 Route::get('/history/download', function () {
     return Excel::download(new ActivityLogsExport, 'activity_logs.xlsx');
 })->name('history.download')->middleware('auth');
+
+Route::post('/dashboard/refresh-cache', function () {
+    Cache::forget('contacts_count');
+    Cache::forget('contacts_added_today');
+    Cache::forget('last_updated_contact');
+    return back()->with('success', 'Dashboard cache refreshed!');
+})->middleware(['auth'])->name('dashboard.refresh-cache');
 
 require __DIR__.'/auth.php';

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Helpers\ActivityLogger;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ContactListsExport;
+use Illuminate\Support\Facades\Cache;
 
 class ContactController extends Controller
 {
@@ -19,9 +20,9 @@ class ContactController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('email', 'like', "%{$request->search}%")
-                  ->orWhere('phone', 'like', "%{$request->search}%")
-                  ->orWhere('company', 'like', "%{$request->search}%");
+                ->orWhere('email', 'like', "%{$request->search}%")
+                ->orWhere('phone', 'like', "%{$request->search}%")
+                ->orWhere('company', 'like', "%{$request->search}%");
             });
         }
 
@@ -35,11 +36,16 @@ class ContactController extends Controller
 
         $contacts = $query->orderBy($sort, $direction)->paginate(10)->appends($request->query());
 
+        // ✅ Cache Dashboard Stats for 10 minutes
+        $contactsCount = Cache::remember('contacts_count', 600, fn() => Contact::count());
+        $contactsAddedToday = Cache::remember('contacts_added_today', 600, fn() => Contact::whereDate('created_at', today())->count());
+        $lastUpdatedContact = Cache::remember('last_updated_contact', 600, fn() => Contact::latest('updated_at')->first());
+
         return view('dashboard', [
             'contacts' => $contacts,
-            'contactsCount' => Contact::count(),
-            'contactsAddedToday' => Contact::whereDate('created_at', today())->count(),
-            'lastUpdatedContact' => Contact::latest('updated_at')->first(),
+            'contactsCount' => $contactsCount,
+            'contactsAddedToday' => $contactsAddedToday,
+            'lastUpdatedContact' => $lastUpdatedContact,
             'sort' => $sort,
             'direction' => $direction,
             'search' => $request->search,

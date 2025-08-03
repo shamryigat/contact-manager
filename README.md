@@ -5,10 +5,11 @@ A **Contact Management System** built with **Laravel 11**, featuring:
 ✅ File Upload (Profile Picture)
 ✅ Email Notifications
 ✅ Logging (Custom Log File)
-✅ Dashboard with Caching
+✅ Dashboard with Caching (Manual Refresh Supported)
 ✅ REST API with Sanctum Authentication
 ✅ Google Maps Integration for Address Preview
 ✅ Laravel Sail (Docker-based Development)
+✅ **Live Deployment:** [https://contact-manager-1lyk.onrender.com](https://contact-manager-1lyk.onrender.com)
 
 ---
 
@@ -20,8 +21,8 @@ A **Contact Management System** built with **Laravel 11**, featuring:
 * 📇 Manage contacts (CRUD)
 * 📤 Upload contact photo
 * 📧 Email notifications on contact creation
-* 📝 Custom logging (`storage/logs/contact.log`)
-* 📊 Dashboard with cached statistics
+* 📝 **Custom logging** (`storage/logs/contact.log`)
+* 📊 **Dashboard with cached statistics (10 min cache + refresh button)**
 * 🗺️ Google Maps preview for contact addresses
 
 ### ✅ API Features
@@ -29,7 +30,7 @@ A **Contact Management System** built with **Laravel 11**, featuring:
 * 🔐 API authentication using Laravel Sanctum
 * 📄 Protected `/api/contacts` CRUD endpoints
 * 🔑 API token-based register/login/logout
-* 🌍 JSON-based responses, easy to use in frontend or mobile apps
+* 🌍 JSON-based responses for easy frontend/mobile integration
 
 ---
 
@@ -55,9 +56,9 @@ npm install && npm run build
 cp .env.example .env
 ```
 
-Update `.env` file (database, mail, app URL, Google Maps API key).
+🔧 Update `.env` (DB, MAIL, APP\_URL, Google Maps API Key)
 
-### 4️⃣ Start Docker (Laravel Sail)
+### 4️⃣ Start Docker
 
 ```bash
 ./vendor/bin/sail up -d
@@ -80,7 +81,7 @@ Update `.env` file (database, mail, app URL, Google Maps API key).
 
 ## 🔑 API Authentication (Laravel Sanctum)
 
-### 1️⃣ Register a user
+### 📌 Register a user
 
 ```bash
 POST /api/register
@@ -94,7 +95,7 @@ Content-Type: application/json
 }
 ```
 
-### 2️⃣ Login to get token
+### 📌 Login to get token
 
 ```bash
 POST /api/login
@@ -106,11 +107,10 @@ Content-Type: application/json
 }
 ```
 
-✅ **Response**
+✅ Response:
 
 ```json
 {
-  "message": "Login successful",
   "user": { "id": 1, "name": "John Doe", "email": "john@example.com" },
   "token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
   "token_type": "Bearer"
@@ -119,12 +119,10 @@ Content-Type: application/json
 
 ---
 
-### 3️⃣ Use the token in API requests
-
-Example using Curl:
+### 📌 Use token in API requests
 
 ```bash
-curl -X GET http://localhost/api/contacts \
+curl -X GET https://contact-manager-1lyk.onrender.com/api/contacts \
   -H "Authorization: Bearer 1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -145,44 +143,39 @@ curl -X GET http://localhost/api/contacts \
 
 ---
 
-## 🚀 Quick Start with Postman
+## 📊 Dashboard Features
 
-1. Open Postman and create a **New Collection**
-2. Add `{{base_url}}` variable → `http://localhost` (or your deployed URL)
-3. Test the following requests in order:
-   ✅ `POST /api/register`
-   ✅ `POST /api/login` (copy token)
-   ✅ Add token to **Authorization → Bearer Token**
-   ✅ Call `GET /api/contacts`, `POST /api/contacts`, etc.
+✔ Total contacts (cached for 10 minutes)
+✔ Recently added contacts
+✔ Last updated contact
+✔ **Manual Refresh Cache Button**
 
 ---
 
-## 📊 Dashboard Features
+## 📝 Logging
 
-✔ Total contacts
-✔ Recently added
-✔ Last updated contact
-✔ Cached for 10 minutes (manual refresh button)
+📂 **Custom Log File:**
+`storage/logs/contact.log`
+
+✅ Logs for:
+✔ Contact Created
+✔ Contact Updated
+✔ Contact Deleted
 
 ---
 
 ## 🗺️ Google Maps Integration
 
-* Add or edit a contact → enter an address → preview map before saving
-* Dashboard table → **View Map** button opens a modal with the location
-
----
-
-## 📨 Email Notifications
-
-* Email sent to the logged-in user when a new contact is created
+* Add/Edit a contact → Enter address → Preview map
+* Dashboard → "View Map" button shows location in modal
 
 ---
 
 ## 📦 Deployment
 
-* Can be deployed to **Render**, **Railway**, **Laravel Forge**, or any PHP 8.2+ hosting
-* Requires MySQL or MariaDB database
+🚀 **Live App:** [https://contact-manager-1lyk.onrender.com](https://contact-manager-1lyk.onrender.com)
+✔ Hosted on **Render (Free Tier)** with MySQL database
+✔ Public GitHub Repo: [https://github.com/shamryigat/contact-manager](https://github.com/shamryigat/contact-manager)
 
 ---
 

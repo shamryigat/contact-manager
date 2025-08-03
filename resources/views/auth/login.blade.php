@@ -18,9 +18,9 @@
                 Add, edit, and keep track of important details with ease.
             </p>
 
-            <a href="{{ url('README.md') }}" target="_blank"
+            <a href="{{ url('https://github.com/shamryigat/contact-manager') }}" target="_blank"
                class="mb-4 underline text-white hover:text-gray-200">
-                📖 View README
+                View GitHub
             </a>
 
             <p class="text-sm opacity-80">Made by <strong>Shamry Igat</strong></p>
