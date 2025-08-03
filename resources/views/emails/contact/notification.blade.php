@@ -15,6 +15,7 @@ A contact has been deleted:
 - **Email:** {{ $contact->email ?? '-' }}
 - **Phone:** {{ $contact->phone ?? '-' }}
 - **Company:** {{ $contact->company ?? '-' }}
+- **Address:** {{ $contact->address ?? '-' }}
 - **Notes:** {{ $contact->notes ?? '-' }}
 @endcomponent
 

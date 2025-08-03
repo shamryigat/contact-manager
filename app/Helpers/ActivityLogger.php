@@ -34,7 +34,7 @@ class ActivityLogger
 
         // ✅ Send email if enabled
         if ($sendEmail && $contact) {
-            Mail::to(config('mail.admin_email', 'your-admin@example.com'))
+            Mail::to(auth()->user()->email)
                 ->send(new ContactNotificationMail($contact, $action, $structuredDetails['old']));
         }
     }
