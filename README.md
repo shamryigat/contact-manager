@@ -1,13 +1,14 @@
 # 📇 Contact Manager (Laravel 11 + Sanctum + Docker)
 
-A simple **Contact Management System** built with **Laravel 11**, featuring:
+A **Contact Management System** built with **Laravel 11**, featuring:
 ✅ Contact CRUD (Create, Read, Update, Delete)
-✅ File Upload (Contact Photo)
+✅ File Upload (Profile Picture)
 ✅ Email Notifications
 ✅ Logging (Custom Log File)
 ✅ Dashboard with Caching
 ✅ REST API with Sanctum Authentication
-✅ Laravel Sail (Docker-based local dev environment)
+✅ Google Maps Integration for Address Preview
+✅ Laravel Sail (Docker-based Development)
 
 ---
 
@@ -18,16 +19,17 @@ A simple **Contact Management System** built with **Laravel 11**, featuring:
 * 👤 User authentication (Laravel Breeze)
 * 📇 Manage contacts (CRUD)
 * 📤 Upload contact photo
-* 📧 Email notifications on new contact creation
-* 📝 Custom logging of contact events (`storage/logs/contact.log`)
-* 📊 Dashboard with cached statistics and cache refresh button
+* 📧 Email notifications on contact creation
+* 📝 Custom logging (`storage/logs/contact.log`)
+* 📊 Dashboard with cached statistics
+* 🗺️ Google Maps preview for contact addresses
 
 ### ✅ API Features
 
 * 🔐 API authentication using Laravel Sanctum
-* 📄 Fully protected `/api/contacts` CRUD endpoints
-* 🔑 API token-based login & logout
-* 📌 Endpoints for registration, login, logout, and contacts management
+* 📄 Protected `/api/contacts` CRUD endpoints
+* 🔑 API token-based register/login/logout
+* 🌍 JSON-based responses, easy to use in frontend or mobile apps
 
 ---
 
@@ -53,7 +55,7 @@ npm install && npm run build
 cp .env.example .env
 ```
 
-Update your `.env` file (database, mail, app URL).
+Update `.env` file (database, mail, app URL, Google Maps API key).
 
 ### 4️⃣ Start Docker (Laravel Sail)
 
@@ -67,7 +69,7 @@ Update your `.env` file (database, mail, app URL).
 ./vendor/bin/sail artisan key:generate
 ```
 
-### 6️⃣ Run migrations & storage link
+### 6️⃣ Run migrations & link storage
 
 ```bash
 ./vendor/bin/sail artisan migrate
@@ -78,7 +80,7 @@ Update your `.env` file (database, mail, app URL).
 
 ## 🔑 API Authentication (Laravel Sanctum)
 
-### 📌 1. Register a new user
+### 1️⃣ Register a user
 
 ```bash
 POST /api/register
@@ -92,18 +94,7 @@ Content-Type: application/json
 }
 ```
 
-✅ Response:
-
-```json
-{
-  "user": { "id": 1, "name": "John Doe", "email": "john@example.com" },
-  "token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-}
-```
-
----
-
-### 📌 2. Login to get API Token
+### 2️⃣ Login to get token
 
 ```bash
 POST /api/login
@@ -115,92 +106,83 @@ Content-Type: application/json
 }
 ```
 
-✅ Response:
+✅ **Response**
 
 ```json
 {
-  "user": { ... },
-  "token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  "message": "Login successful",
+  "user": { "id": 1, "name": "John Doe", "email": "john@example.com" },
+  "token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "token_type": "Bearer"
 }
 ```
 
 ---
 
-### 📌 3. Use Bearer Token for API Requests
+### 3️⃣ Use the token in API requests
 
-Example:
-
-```bash
-GET /api/contacts
-Authorization: Bearer 1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
----
-
-### 📌 4. Logout
+Example using Curl:
 
 ```bash
-POST /api/logout
-Authorization: Bearer 1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-✅ Response:
-
-```json
-{ "message": "Logged out" }
+curl -X GET http://localhost/api/contacts \
+  -H "Authorization: Bearer 1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 ---
 
 ### 📌 API Endpoints
 
-| Method | Endpoint             | Auth Required | Description         |
-| ------ | -------------------- | ------------- | ------------------- |
-| POST   | `/api/register`      | ❌             | Register user       |
-| POST   | `/api/login`         | ❌             | Login and get token |
-| GET    | `/api/contacts`      | ✅             | List contacts       |
-| POST   | `/api/contacts`      | ✅             | Create contact      |
-| GET    | `/api/contacts/{id}` | ✅             | Show contact        |
-| PUT    | `/api/contacts/{id}` | ✅             | Update contact      |
-| DELETE | `/api/contacts/{id}` | ✅             | Delete contact      |
-| POST   | `/api/logout`        | ✅             | Logout user         |
+| Method | Endpoint             | Auth | Description    |
+| ------ | -------------------- | ---- | -------------- |
+| POST   | `/api/register`      | ❌    | Register user  |
+| POST   | `/api/login`         | ❌    | Login user     |
+| GET    | `/api/contacts`      | ✅    | List contacts  |
+| POST   | `/api/contacts`      | ✅    | Create contact |
+| GET    | `/api/contacts/{id}` | ✅    | Show contact   |
+| PUT    | `/api/contacts/{id}` | ✅    | Update contact |
+| DELETE | `/api/contacts/{id}` | ✅    | Delete contact |
+| POST   | `/api/logout`        | ✅    | Logout user    |
+
+---
+
+## 🚀 Quick Start with Postman
+
+1. Open Postman and create a **New Collection**
+2. Add `{{base_url}}` variable → `http://localhost` (or your deployed URL)
+3. Test the following requests in order:
+   ✅ `POST /api/register`
+   ✅ `POST /api/login` (copy token)
+   ✅ Add token to **Authorization → Bearer Token**
+   ✅ Call `GET /api/contacts`, `POST /api/contacts`, etc.
 
 ---
 
 ## 📊 Dashboard Features
 
-* Shows **total contacts**, **recently added**, **last updated**
-* Cached for 10 minutes
-* "🔄 Refresh Cache" button to clear cache
+✔ Total contacts
+✔ Recently added
+✔ Last updated contact
+✔ Cached for 10 minutes (manual refresh button)
+
+---
+
+## 🗺️ Google Maps Integration
+
+* Add or edit a contact → enter an address → preview map before saving
+* Dashboard table → **View Map** button opens a modal with the location
 
 ---
 
 ## 📨 Email Notifications
 
-* When a new contact is created, an email is sent to the logged-in user
-* Email events are **logged in `storage/logs/contact.log`**
-
----
-
-## 📝 Logging
-
-Custom log file:
-
-```
-storage/logs/contact.log
-```
-
-Logs events for:
-✅ Contact Created
-✅ Contact Updated
-✅ Contact Deleted
+* Email sent to the logged-in user when a new contact is created
 
 ---
 
 ## 📦 Deployment
 
-* You can deploy this app on any hosting that supports **PHP 8.2+ & MySQL**
-* For free hosting, use **Render**, **Railway**, or **Laravel Forge** (paid)
+* Can be deployed to **Render**, **Railway**, **Laravel Forge**, or any PHP 8.2+ hosting
+* Requires MySQL or MariaDB database
 
 ---
 
@@ -209,6 +191,3 @@ Logs events for:
 MIT License – free to use and modify.
 
 ---
-
-🔥 **Do you want me to also include a *"Quick Start API Testing with Postman / Curl"* section and a **visual API flow diagram** in the README?**
-This would make your GitHub project look more **professional for job applications.**

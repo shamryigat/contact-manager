@@ -13,10 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies(at: '*'); // ✅ ADD THIS LINE
+        $middleware->trustProxies(at: '*');
 
         $middleware->group('api', [
-            // REMOVE EnsureFrontendRequestsAreStateful
+            EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
 
         $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);

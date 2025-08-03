@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
-class AuthController extends Controller{
-    // Register API User
-    public function register(Request $request){
+class AuthController extends Controller
+{
+    public function register(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email',
@@ -26,33 +27,38 @@ class AuthController extends Controller{
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
+            'message' => 'User registered successfully',
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'token_type' => 'Bearer'
         ], 201);
     }
 
-    // Login API User
-    public function login(Request $request){
-        $credentials = $request->validate([
+    public function login(Request $request)
+    {
+        $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        if (!Auth::attempt($credentials)) {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $user = Auth::user();
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
+            'message' => 'Login successful',
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'token_type' => 'Bearer'
         ]);
     }
 
-    // Logout API User
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         $request->user()->tokens()->delete();
 
         return response()->json(['message' => 'Logged out successfully']);

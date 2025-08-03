@@ -35,12 +35,12 @@
                     </td>
                     <td class="border p-3">{{ $contact->notes ?? '-' }}</td>
                     <td class="border p-3 flex flex-col gap-1">
-                        <a href="{{ route('contacts.edit',$contact) }}" class="text-blue-500">✏ Edit</a>
+                        <a href="{{ route('contacts.edit',$contact) }}" class="text-blue-500">Edit</a>
 
                         <form action="{{ route('contacts.destroy',$contact) }}" method="POST" class="inline-block">
                             @csrf @method('DELETE')
                             <button onclick="return confirm('Delete this contact?')" 
-                                    class="text-red-500">🗑 Delete</button>
+                                    class="text-red-500">Delete</button>
                         </form>
                     </td>
                 </tr>
