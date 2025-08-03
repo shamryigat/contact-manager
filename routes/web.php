@@ -16,15 +16,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard uses controller logic
     Route::get('/dashboard', [ContactController::class, 'index'])->name('dashboard');
 
+    // This route MUST come before the resource route
+    Route::get('/contacts/export', [ContactController::class, 'export'])->name('contacts.export');
+
+    // Contact CRUD
+    // We will use the apiResource method for simplicity and better naming
+    Route::resource('contacts', ContactController::class);
+    
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/contacts/export', [ContactController::class, 'export'])->name('contacts.export');
-    // Contact CRUD
-    Route::resource('contacts', ContactController::class);
 });
-
 
 Route::get('/history', [HistoryController::class, 'index'])
     ->middleware('auth')
@@ -33,7 +36,5 @@ Route::get('/history', [HistoryController::class, 'index'])
 Route::get('/history/download', function () {
     return Excel::download(new ActivityLogsExport, 'activity_logs.xlsx');
 })->name('history.download')->middleware('auth');
-
-
 
 require __DIR__.'/auth.php';
