@@ -29,6 +29,6 @@ class ContactListsExport implements FromCollection, WithHeadings, WithMapping
 
     public function headings(): array
     {
-        return ['Name', 'Email', 'Phone', 'Company', 'Notes', 'Created At'];
+        return ['Name', 'Email', 'Phone', 'Company', 'Address', 'Notes', 'Created At'];
     }
 }
