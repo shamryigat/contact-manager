@@ -7,7 +7,7 @@
                 <th class="border p-3">Phone</th>
                 <th class="border p-3">Email</th>
                 <th class="border p-3">Company</th>
-                <th class="border p-3">Address</th> <!-- ✅ Added -->
+                <th class="border p-3">Address</th>
                 <th class="border p-3">Notes</th>
                 <th class="border p-3">Actions</th>
             </tr>
