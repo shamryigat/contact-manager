@@ -1,4 +1,4 @@
-<div class="bg-white shadow rounded-lg overflow-hidden">
+<div class="bg-white overflow-x-auto">
     <table class="w-full border-collapse">
         <thead class="bg-gray-100">
             <tr>
