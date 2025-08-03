@@ -58,7 +58,7 @@
 
             <!-- Profile Picture -->
             <div class="mb-4">
-                <label class="block font-medium">Profile Picture [jpg,jpeg,png|max:5MB]</label>
+                <label class="block font-medium">Profile Picture [Format: jpg,jpeg,png | Max: 5MB]</label>
 
                 @if($contact->profile_picture)
                     <div class="mb-3">
