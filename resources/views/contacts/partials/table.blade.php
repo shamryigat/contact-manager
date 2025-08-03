@@ -34,14 +34,21 @@
                         @endif
                     </td>
                     <td class="border p-3">{{ $contact->notes ?? '-' }}</td>
-                    <td class="border p-3 flex flex-col gap-1">
-                        <a href="{{ route('contacts.edit',$contact) }}" class="text-blue-500">Edit</a>
+                    <td class="border p-3">
+                        <div class="flex gap-2">
+                            <a href="{{ route('contacts.edit', $contact) }}" 
+                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">Edit</a>
 
-                        <form action="{{ route('contacts.destroy',$contact) }}" method="POST" class="inline-block">
-                            @csrf @method('DELETE')
-                            <button onclick="return confirm('Delete this contact?')" 
-                                    class="text-red-500">Delete</button>
-                        </form>
+                            <form action="{{ route('contacts.destroy', $contact) }}" method="POST" 
+                                onsubmit="return confirm('Delete this contact?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                        class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             @empty
